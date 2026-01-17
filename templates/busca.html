@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Buscar livros</title>
+    <!-- fonte do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        /* só pra deixar tabela mais limpa */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        .disponivel {
+            color: green;
+            font-weight: bold;
+        }
+
+        .emprestado {
+            color: crimson;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Buscar livros</h1>
+
+<form method="get">
+    <input type="text" name="q" placeholder="título ou autor">
+
+    <select name="categoria">
+        <option value="">Todas categorias</option>
+        {% for c in categorias %}
+            <option value="{{ c[0] }}">{{ c[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="genero">
+        <option value="">Todos gêneros</option>
+        {% for g in generos %}
+            <option value="{{ g[0] }}">{{ g[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Buscar</button>
+</form>
+
+<hr>
+
+{% if livros %}
+<table>
+    <tr>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>Categoria</th>
+        <th>Gênero</th>
+        <th>Idioma</th>
+        <th>Status</th>
+    </tr>
+
+    {% for l in livros %}
+    <tr>
+        <td>{{ l.titulo }}</td>
+        <td>{{ l.autor }}</td>
+        <td>{{ l.categoria }}</td>
+        <td>{{ l.genero }}</td>
+        <td>{{ l.idioma }}</td>
+        <td class="{{ 'disponivel' if l.disponivel else 'emprestado' }}">
+            {{ 'Disponível' if l.disponivel else 'Emprestado para ' ~ l.emprestado_para }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Nada encontrado.</p>
+{% endif %}
+
+<a href="/">Voltar</a>
+
+</body>
+</html>

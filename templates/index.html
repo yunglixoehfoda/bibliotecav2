@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Biblioteca Online</h1>
+
+<form method="get" class="busca-form">
+    <input type="text" name="q" placeholder="Buscar por título ou autor" value="{{ request.args.get('q', '') }}">
+
+    <select name="categoria">
+        <option value="">Todas categorias</option>
+        {% for c in categorias %}
+            <option value="{{ c.id }}" {% if request.args.get('categoria') == c.id|string %}selected{% endif %}>
+                {{ c.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="genero">
+        <option value="">Todos gêneros</option>
+        {% for g in generos %}
+            <option value="{{ g.id }}" {% if request.args.get('genero') == g.id|string %}selected{% endif %}>
+                {{ g.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-primary">Buscar</button>
+</form>
+
+{% if livros %}
+<div class="tabela-livros">
+    <div class="linha header">
+        <span>Título</span>
+        <span>Autor</span>
+        <span>Categoria</span>
+        <span>Gênero</span>
+        <span>Idioma</span>
+        <span>Status</span>
+    </div>
+
+    {% for l in livros %}
+    <div class="linha">
+        <span data-label="Título">{{ l.titulo }}</span>
+        <span data-label="Autor">{{ l.autor }}</span>
+        <span data-label="Categoria">{{ l.categoria }}</span>
+        <span data-label="Gênero">{{ l.genero }}</span>
+        <span data-label="Idioma">{{ l.idioma }}</span>
+        {% if l.disponivel %}
+            <span data-label="Status" class="status disponivel">Disponível</span>
+        {% else %}
+            <span data-label="Status" class="status emprestado">Emprestado</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Nada encontrado.</p>
+{% endif %}
+
+{% endblock %}

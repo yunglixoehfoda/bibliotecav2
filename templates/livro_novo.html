@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-center">
+
+    <div class="novo-livro-layout">
+
+        <!-- FORMULARIO -->
+        <form method="post" class="livro-form">
+
+            <h1>Adicionar livro</h1>
+
+            <label>
+                Título
+                <input name="titulo" required>
+            </label>
+
+            <label>
+                Autor
+                <input name="autor" required>
+            </label>
+
+            <label>
+                Ano
+                <input name="ano" type="number">
+            </label>
+
+            <label>
+                ISBN
+                <input name="isbn">
+            </label>
+
+            <label>
+                Idioma
+                <input name="idioma">
+            </label>
+
+            <label>
+                Gênero
+                <input name="categoria" id="input-categoria" placeholder="Digite ou clique">
+            </label>
+
+            <label>
+                Categoria
+                <input name="genero" id="input-genero" placeholder="Digite ou clique">
+            </label>
+
+            <div class="form-acoes">
+                <a href="/livros" class="btn btn-editar">Cancelar</a>
+                <button class="btn btn-primary">Salvar alterações</button>
+            </div>
+        </form>
+
+        <!-- LISTAS DE CATEGORIAS E GENEROS -->
+        <div class="listas">
+            <div class="lista-box">
+                <h3>Gênero</h3>
+                <ul>
+                    {% for c in categorias %}
+                        <li onclick="document.getElementById('input-categoria').value='{{ c.nome }}'">
+                            {{ c.nome }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="lista-box">
+                <h3>Categoria</h3>
+                <ul>
+                    {% for g in generos %}
+                        <li onclick="document.getElementById('input-genero').value='{{ g.nome }}'">
+                            {{ g.nome }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

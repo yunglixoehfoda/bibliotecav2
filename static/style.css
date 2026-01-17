@@ -1,0 +1,755 @@
+/* =========================
+   RESET + BASE
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    padding: 30px;
+    background:
+        radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%),
+        linear-gradient(180deg, #0b0b0b, #141414);
+    color: #eaeaea;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* =========================
+   NAVBAR / TOPO
+========================= */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(12px);
+
+    padding: 14px 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 18px;
+    color: #00eaff;
+    letter-spacing: 1px;
+}
+
+/* menu */
+.menu-topo {
+    display: flex;
+    gap: 12px;
+}
+
+/* =========================
+   BOTÕES (GERAL)
+========================= */
+.btn,
+.top-btn {
+    padding: 10px 18px;
+    border-radius: 14px;
+    background: #1a1a1a;
+    color: #ddd;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+/* brilho animado */
+.btn::after,
+.top-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(0, 255, 255, 0.35),
+        transparent
+    );
+    transform: translateX(-120%);
+    transition: transform 0.4s;
+}
+
+.btn:hover::after,
+.top-btn:hover::after {
+    transform: translateX(120%);
+}
+
+.btn:hover,
+.top-btn:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 18px rgba(0, 255, 255, 0.4);
+    color: #00eaff;
+}
+
+/* destaque */
+.btn-primary,
+.top-btn.destaque {
+    background: linear-gradient(135deg, #00eaff, #007bff);
+    color: #001b2b;
+    font-weight: 700;
+}
+
+.btn-primary:hover,
+.top-btn.destaque:hover {
+    box-shadow: 0 0 25px rgba(0, 234, 255, 0.7);
+}
+
+/* variações */
+.btn-danger {
+    background: linear-gradient(135deg, #ff4a4a, #c0392b);
+    color: #2e0000;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2ecc71, #16a34a);
+    color: #052e16;
+}
+
+/* =========================
+   TÍTULOS / TEXTO
+========================= */
+h1, h2, h3 {
+    color: #00eaff;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+}
+
+p {
+    color: #bdbdbd;
+    margin-bottom: 12px;
+}
+
+/* =========================
+   FORMULÁRIOS
+========================= */
+form {
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
+    margin-bottom: 24px;
+}
+
+label {
+    font-size: 16px;
+    color: #aaa;
+    display: block;
+    margin-bottom: 6px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: none;
+    background: #1b1b1b;
+    color: #fff;
+    outline: none;
+    margin-bottom: 14px;
+    transition: box-shadow 0.25s, background 0.25s;
+}
+
+input:focus,
+select:focus {
+    background: #222;
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.35);
+}
+
+/* =========================
+   TABELAS
+========================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #121212;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.05);
+}
+
+th {
+    background: #1f1f1f;
+    padding: 14px;
+    text-align: left;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #aaa;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #1f1f1f;
+    transition: background 0.3s;
+}
+
+tr:hover td {
+    background: rgba(0, 255, 255, 0.04);
+}
+
+/* =========================
+   STATUS
+========================= */
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+    width: fit-content;
+}
+
+.status.disponivel {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: #0b2f28;
+}
+
+.status.emprestado {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #2e0000;
+}
+
+/* =========================
+   CARDS (LIVROS / LOGIN)
+========================= */
+.card,
+.login-card {
+    max-width: 420px;
+    margin: 40px auto;
+    background: rgba(18, 18, 18, 0.9);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
+    text-align: center;
+}
+
+/* =========================
+   GRID DE LIVROS
+========================= */
+.livros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.livro-card {
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .topbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .menu-topo {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+/* =========================
+   TABELA – INDEX
+========================= */
+
+.tabela-livros {
+    width: 100%;
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
+}
+
+/* linha padrão */
+.linha {
+    display: grid;
+    grid-template-columns:
+        2.5fr   /* título */
+        2fr     /* autor */
+        1.2fr   /* categoria */
+        1.2fr   /* gênero */
+        1fr     /* status */
+        1.4fr;  /* ações */
+
+    padding: 14px 18px;
+    align-items: center;
+    gap: 12px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.25s;
+}
+
+.linha:last-child {
+    border-bottom: none;
+}
+
+/* header */
+.linha.header {
+    background: rgba(255,255,255,0.04);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+/* hover */
+.linha:not(.header):hover {
+    background: rgba(0, 255, 255, 0.05);
+}
+
+/* colunas */
+.linha span {
+    color: #e5e7eb;
+    font-size: 14px;
+}
+
+/* ações */
+.linha .acoes {
+    display: flex;
+    gap: 8px;
+}
+
+/* botões dentro da tabela */
+.linha a,
+.linha button {
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: #1a1a1a;
+    color: #00eaff;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.linha a:hover,
+.linha button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 14px rgba(0, 255, 255, 0.4);
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.linha .status {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    width: fit-content;
+}
+
+.linha .status.disponivel {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: #052e16;
+}
+
+.linha .status.emprestado {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #2e0000;
+}
+
+/* =========================
+   RESPONSIVO (MOBILE)
+========================= */
+
+@media (max-width: 768px) {
+
+    .linha.header {
+        display: none;
+    }
+
+    .linha {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 14px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+        background: rgba(18,18,18,0.9);
+    }
+
+    .linha span {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .linha span::before {
+        content: attr(data-label);
+        color: #9ca3af;
+        font-weight: 600;
+    }
+
+    .linha .acoes {
+        justify-content: flex-end;
+        margin-top: 6px;
+    }
+}
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px 40px;
+    margin-bottom: 30px;
+
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(12px);
+
+    border-radius: 18px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+/* logo */
+.logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #00eaff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* botão base */
+.nav-btn {
+    padding: 10px 18px;
+    border-radius: 14px;
+
+    background: #1a1a1a;
+    color: #ddd;
+
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* efeito brilho */
+.nav-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(0, 255, 255, 0.35),
+        transparent
+    );
+    transform: translateX(-120%);
+    transition: transform 0.4s;
+}
+
+.nav-btn:hover::after {
+    transform: translateX(120%);
+}
+
+.nav-btn:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 18px rgba(0, 255, 255, 0.4);
+    color: #00eaff;
+}
+
+/* botão destaque */
+.nav-btn.destaque {
+    background: linear-gradient(135deg, #00eaff, #007bff);
+    color: #001b2b;
+    font-weight: 700;
+}
+
+.nav-btn.destaque:hover {
+    box-shadow: 0 0 25px rgba(0, 234, 255, 0.7);
+}
+
+/* logout */
+.nav-btn.logout {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #2e0000;
+    font-weight: 700;
+}
+
+.nav-btn.logout:hover {
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
+}
+/* botão backup */
+.nav-btn.backup {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #022c22;
+    font-weight: 700;
+}
+
+.nav-btn.backup:hover {
+    box-shadow: 0 0 22px rgba(34, 197, 94, 0.7);
+}
+
+/* estado de erro no login */
+.login-form.erro label {
+    color: #b91c1c;
+}
+
+.login-form.erro input {
+    border-color: #ef4444;
+    background: #ef4444;
+}
+
+.login-form.erro input:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.35);
+}
+
+.livro-card form {
+    display: flex;
+    gap: 10px;
+}
+
+.livro-card .btn {
+    width: 100%;
+}
+.btn-editar {
+    display: block;      /* vira bloco */
+    text-align: center;  /* centraliza o texto */
+}
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-box {
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(14px);
+
+    padding: 26px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 420px;
+
+    box-shadow:
+        0 0 40px rgba(0, 255, 255, 0.12),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+
+    animation: modalFade 0.25s ease-out;
+}
+
+/* animação suave */
+@keyframes modalFade {
+    from {
+        transform: translateY(12px) scale(0.96);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-box h3 {
+    color: #00eaff;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.modal-box p {
+    color: #bdbdbd;
+    font-size: 14px;
+}
+
+.modal-box b {
+    color: #00eaff;
+}
+
+/* input do modal */
+.modal-box input {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: none;
+
+    background: #1b1b1b;
+    color: #fff;
+
+    outline: none;
+    transition: box-shadow 0.25s, background 0.25s;
+}
+
+.modal-box input:focus {
+    background: #222;
+    box-shadow: 0 0 0 2px rgba(0, 234, 255, 0.35);
+}
+
+/* ações */
+.modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+
+/* layout 3 colunas: form + categorias + gêneros */
+.novo-livro-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* form maior, listas iguais */
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* form estilo card */
+.livro-form {
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* listas lado a lado: categorias + gêneros */
+.listas {
+    display: flex;
+    flex-direction: row; /* agora ficam lado a lado */
+    gap: 20px;
+}
+
+/* cada lista estilo card */
+.lista-box {
+    flex: 1; /* ocupam largura igual */
+    min-width: 150px;
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(12px);
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+.lista-box h3 {
+    color: #00eaff;
+    margin-bottom: 10px;
+}
+
+.lista-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lista-box li {
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: #1b1b1b;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.lista-box li:hover {
+    background: #222;
+    box-shadow: 0 0 12px rgba(0, 234, 255, 0.25);
+}
+
+/* responsivo */
+@media (max-width: 1024px) {
+    .novo-livro-layout {
+        grid-template-columns: 1fr 1fr; /* form + listas juntas */
+    }
+}
+
+@media (max-width: 768px) {
+    .novo-livro-layout {
+        grid-template-columns: 1fr; /* tudo em coluna no mobile */
+    }
+
+    .listas {
+        flex-direction: column; /* listas empilham no mobile */
+    }
+}
+.form-acoes {
+    display: flex;
+    gap: 12px; /* espaço entre os botões */
+}
+
+.form-acoes .btn {
+    flex: 1;           /* cada botão ocupa metade do espaço disponível */
+    text-align: center; /* centraliza o texto */
+}

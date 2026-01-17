@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Livros</h1>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<form method="get" class="busca-form">
+    <input type="text" name="q" placeholder="Buscar por título ou autor" value="{{ request.args.get('q', '') }}">
+
+    <select name="categoria">
+        <option value="">Todas categorias</option>
+        {% for c in categorias %}
+            <option value="{{ c.id }}" {% if request.args.get('categoria') == c.id|string %}selected{% endif %}>
+                {{ c.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="genero">
+        <option value="">Todos gêneros</option>
+        {% for g in generos %}
+            <option value="{{ g.id }}" {% if request.args.get('genero') == g.id|string %}selected{% endif %}>
+                {{ g.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-primary">Buscar</button>
+</form>
+
+<hr>
+
+<div class="livros-grid">
+{% for l in livros %}
+    <div class="livro-card" id="livro-{{ l.id }}">
+        <h3>{{ l.titulo }}</h3>
+        <p class="autor">{{ l.autor }}</p>
+        <p class="meta">{{ l.categoria }} • {{ l.genero }} • {{ l.idioma }}</p>
+
+        {% if l.disponivel %}
+            <span class="status disponivel">Disponível</span>
+            <form class="form-emprestar" onsubmit="emprestarLivro(event, {{ l.id }})">
+                <input name="nome" placeholder="Nome da pessoa" required>
+                <button class="btn btn-success">Emprestar</button>
+            </form>
+        {% else %}
+            <span class="status emprestado">Emprestado para {{ l.emprestado_para }}</span>
+            <form class="form-devolver" onsubmit="devolverLivro(event, {{ l.id }})">
+                <button class="btn btn-warning">Devolver</button>
+            </form>
+        {% endif %}
+
+        <a href="/livro/{{ l.id }}/editar" class="btn btn-primary btn-editar">Editar livro</a>
+        <button type="button" class="btn btn-danger btn-remover" data-id="{{ l.id }}" data-titulo="{{ l.titulo }}" onclick="abrirModal(this)">
+            Remover livro
+        </button>
+    </div>
+{% endfor %}
+</div>
+
+<div id="modal-remover" class="modal hidden">
+    <div class="modal-box">
+        <h3>Remover livro</h3>
+        <p>Para confirmar, digite exatamente: <b id="titulo-confirmacao"></b></p>
+        <input type="text" id="input-confirmacao" placeholder="Digite o nome do livro">
+        <form id="form-remover" method="post">
+            <div class="modal-acoes">
+                <button class="btn btn-primary" type="button" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-danger" id="btn-confirmar" disabled>Remover livro</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModal(btn) {
+    const id = btn.dataset.id;
+    const titulo = btn.dataset.titulo;
+
+    document.getElementById("modal-remover").classList.remove("hidden");
+    document.getElementById("titulo-confirmacao").innerText = titulo;
+
+    const input = document.getElementById("input-confirmacao");
+    const confirmar = document.getElementById("btn-confirmar");
+    const form = document.getElementById("form-remover");
+
+    input.value = "";
+    confirmar.disabled = true;
+    form.action = `/livro/${id}/remover`;
+
+    input.oninput = () => {
+        confirmar.disabled = input.value.trim() !== titulo;
+    };
+}
+
+function fecharModal() {
+    document.getElementById("modal-remover").classList.add("hidden");
+}
+
+async function emprestarLivro(e, id) {
+    e.preventDefault();
+    const form = e.target;
+    const nome = form.querySelector("input[name='nome']").value.trim();
+    if (!nome) return;
+
+    const resp = await fetch(`/livro/${id}/emprestar`, { method: "POST", body: new FormData(form) });
+    const data = await resp.json();
+    if (!data.ok) return alert(data.erro || "Erro ao emprestar");
+
+    const card = document.getElementById(`livro-${id}`);
+    card.querySelector(".status").outerHTML = `<span class="status emprestado">Emprestado para ${data.nome}</span>`;
+
+    card.querySelector(".form-emprestar").outerHTML = `
+        <form class="form-devolver" onsubmit="devolverLivro(event, ${id})">
+            <button class="btn btn-warning">Devolver</button>
+        </form>
+    `;
+}
+
+async function devolverLivro(e, id) {
+    e.preventDefault();
+    const form = e.target;
+
+    const resp = await fetch(`/livro/${id}/devolver`, { method: "POST" });
+    const data = await resp.json();
+    if (!data.ok) return alert(data.erro || "Erro ao devolver");
+
+    const card = document.getElementById(`livro-${id}`);
+    card.querySelector(".status").outerHTML = `<span class="status disponivel">Disponível</span>`;
+
+    card.querySelector(".form-devolver").outerHTML = `
+        <form class="form-emprestar" onsubmit="emprestarLivro(event, ${id})">
+            <input name="nome" placeholder="Nome da pessoa" required>
+            <button class="btn btn-success">Emprestar</button>
+        </form>
+    `;
+}
+</script>
+
+{% endblock %}
