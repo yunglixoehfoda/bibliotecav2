@@ -12,6 +12,7 @@
         <label>
             Título
             <input
+                placeholder="Título"
                 type="text"
                 name="titulo"
                 value="{{ livro.titulo }}"
@@ -22,6 +23,7 @@
         <label>
             Autor
             <input
+                placeholder="Autor"
                 type="text"
                 name="autor"
                 value="{{ livro.autor }}"
@@ -32,6 +34,7 @@
         <label>
             Ano
             <input
+                placeholder="Ano"
                 type="number"
                 name="ano"
                 value="{{ livro.ano or '' }}"
@@ -41,6 +44,7 @@
         <label>
             ISBN
             <input
+                placeholder="ISBN"
                 type="text"
                 name="isbn"
                 value="{{ livro.isbn or '' }}"
@@ -50,6 +54,7 @@
         <label>
             Idioma
             <input
+                placeholder="Idioma"
                 type="text"
                 name="idioma"
                 value="{{ livro.idioma }}"
@@ -58,12 +63,12 @@
 
         <label>
             Categoria
-                    <input name="categoria" id="input-categoria" value="{{ livro.categoria}}">
+                    <input placeholder="Categoria" name="categoria" id="input-categoria" value="{{ livro.categoria}}">
         </label>
 
         <label>
             Gênero
-            <input name="genero" id="input-genero" value="{{ livro.genero }}">
+            <input placeholder="Gênero" name="genero" id="input-genero" value="{{ livro.genero }}">
         </label>
 
         <div class="form-acoes">
