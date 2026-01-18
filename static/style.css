@@ -891,6 +891,8 @@ tr:hover td {
   }
 
   .mobile-nav {
+    font-size: 24px;
+    filter: drop-shadow(0 0 6px rgba(0,234,255,.4));
     position: fixed;
     bottom: 14px;
     left: 50%;
@@ -1337,7 +1339,7 @@ tr:hover td {
 .page-loader {
   position: fixed;
   inset: 0;
-  background: rgba(240, 248, 255, 0.85); /* azul gelo */
+  background:  var(--bg-soft, var(--bg-card));;/* azul gelo */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1396,4 +1398,88 @@ tr:hover td {
 [data-theme="dark"] {
   --skeleton-base: #1f2a36;
   --skeleton-highlight: #2b3a4a;
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+  color:var(--bg-soft, var(--bg-card))
+  transition: transform .25s ease, filter .25s ease, color .25s;
+}
+
+.mobile-nav a:active svg,
+.nav-btn:hover svg {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px --bg-card);
+}
+body.dark .icon {
+  color: var(--bg-card);
+}
+
+body.light .icon {
+  color: var(--bg-soft, var(--bg-card));;
+}
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.theme-icon {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  transition: transform .4s ease;
+}
+
+/* sol */
+.sun {
+  color: var(--text);
+  fill: currentColor;
+  transition: opacity .3s ease, transform .4s ease;
+}
+
+.sun-rays line {
+  transition: opacity .3s ease;
+}
+
+/* lua */
+.moon {
+  color: var(--bg-soft, var(--text));;
+  fill: currentColor;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity .3s ease, transform .4s ease;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+:root[data-theme="dark"] .sun,
+:root[data-theme="dark"] .sun-rays {
+  opacity: 0;
+}
+
+:root[data-theme="dark"] .moon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+:root[data-theme="dark"] .theme-icon {
+  transform: rotate(40deg);
+}
+
+/* =========================
+   LIGHT MODE
+========================= */
+:root[data-theme="light"] .sun,
+:root[data-theme="light"] .sun-rays {
+  opacity: 1;
+}
+
+:root[data-theme="light"] .moon {
+  opacity: 0;
 }
