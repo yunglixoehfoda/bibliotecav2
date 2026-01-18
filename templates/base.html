@@ -1,41 +1,137 @@
 <!DOCTYPE html>
-<html>
-    
+<html lang="pt-br">
 <head>
     <meta charset="utf-8">
     <title>Acervo</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav class="navbar">
-    <div class="nav-left">
-        <div class="logo">
-            📚 <span>Acervo</span>
-        </div>
+    <div id="page-loader" class="page-loader hidden">
+      <div class="spinner"></div>
     </div>
 
-    <div class="nav-links">
-        <a href="/" class="nav-btn">Home</a>
 
-        {% if not session.role %}
-            <a href="/login" class="nav-btn">Login</a>
-        {% endif %}
+    <!-- NAVBAR DESKTOP -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">
+                📚 <span>Acervo</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/" class="nav-btn">Home</a>
+
+            {% if not session.role %}
+                <a href="/login" class="nav-btn">Login</a>
+            {% endif %}
+
+            {% if session.role == "admin" %}
+                <a href="/livros" class="nav-btn">Livros</a>
+                <a href="/livro/novo" class="nav-btn destaque">Novo livro</a>
+                <a href="/backup/livros" class="nav-btn backup">Backup</a>
+                <a href="/logout" class="nav-btn logout">Sair</a>
+            {% endif %}
+            <button class="theme-toggle theme-btn" aria-label="Alternar tema">🌙</button>
+
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- NAVBAR MOBILE (EMBAIXO) -->
+    <nav class="mobile-nav">
+        <a href="/" class="mobile-item">
+            <span class="icon">🏠</span>
+            <span class="label"></span>
+        </a>
+        <button class="theme-toggle theme-btn" aria-label="Alternar tema">🌙</button>
+
 
         {% if session.role == "admin" %}
-            <a href="/livros" class="nav-btn">Livros</a>
-            <a href="/livro/novo" class="nav-btn destaque">Novo livro</a>
+        <a href="/livros" class="mobile-item">
+            <span class="icon">📚</span>
+            <span class="label"></span>
+        </a>
 
-            <a href="/backup/livros" class="nav-btn backup">
-                Backup
-            </a>
+        <a href="/livro/novo" class="mobile-item add">
+            <span class="icon">➕</span>
+        </a>
 
-            <a href="/logout" class="nav-btn logout">Sair</a>
+        <a href="/backup/livros" class="mobile-item">
+            <span class="icon">💾</span>
+            <span class="label"></span>
+        </a>
         {% endif %}
-    </div>
-</nav>
 
+        {% if session.role %}
+        <a href="/logout" class="mobile-item">
+            <span class="icon">🚪</span>
+            <span class="label"></span>
+        </a>
+        {% else %}
+        <a href="/login" class="mobile-item">
+            <span class="icon">🔐</span>
+            <span class="label"></span>
+        </a>
+        {% endif %}
+    </nav>
 
-    {% block content %}{% endblock %}
 </body>
+<script>
+
+  const toggles = document.querySelectorAll(".theme-toggle");
+  const root = document.documentElement;
+
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  root.setAttribute("data-theme", savedTheme);
+
+  toggles.forEach(btn => {
+    btn.textContent = savedTheme === "light" ? "🌞" : "🌙";
+
+    btn.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme");
+      const next = current === "light" ? "dark" : "light";
+
+      root.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+
+      toggles.forEach(b =>
+        b.textContent = next === "light" ? "🌞" : "🌙"
+      );
+    });
+  });
+  const loader = document.getElementById("page-loader");
+
+  // mostra loader ao clicar em links internos
+  document.querySelectorAll("a[href]").forEach(link => {
+    link.addEventListener("click", e => {
+      const href = link.getAttribute("href");
+
+      if (
+        href.startsWith("/") &&
+        !href.startsWith("#") &&
+        !link.target
+      ) {
+        loader.classList.remove("hidden");
+      }
+    });
+  });
+
+  // garante q some qnd a página carregar
+  window.addEventListener("load", () => {
+    loader.classList.add("hidden");
+  });
+
+</script>
+
+
 </html>
+
