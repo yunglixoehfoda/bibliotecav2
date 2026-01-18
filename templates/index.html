@@ -27,8 +27,9 @@
     <button class="btn btn-primary">Buscar</button>
 </form>
 
-{% if livros %}
-<div class="tabela-livros">
+{% if livros and livros|length > 0 %}
+<div class="tabela-livros" id="cards">
+
     <div class="linha header">
         <span>Título</span>
         <span>Autor</span>
@@ -45,16 +46,28 @@
         <span data-label="Categoria">{{ l.categoria }}</span>
         <span data-label="Gênero">{{ l.genero }}</span>
         <span data-label="Idioma">{{ l.idioma }}</span>
+
         {% if l.disponivel %}
-            <span data-label="Status" class="status disponivel">Disponível</span>
+            <span class="status disponivel">Disponível</span>
         {% else %}
-            <span data-label="Status" class="status emprestado">Emprestado</span>
+            <span class="status emprestado">Emprestado</span>
         {% endif %}
     </div>
     {% endfor %}
+
 </div>
+
 {% else %}
-<p>Nada encontrado.</p>
+<div class="skeleton-list">
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+
+    <p class="empty-text">
+        Nenhum livro encontrado.
+    </p>
+</div>
 {% endif %}
+
 
 {% endblock %}
