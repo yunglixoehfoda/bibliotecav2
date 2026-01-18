@@ -38,7 +38,7 @@
             {% if session.role == "admin" %}
                 <a href="/livros" class="nav-btn">Livros</a>
                 <a href="/livro/novo" class="nav-btn destaque">Novo livro</a>
-                <a href="/backup/livros" class="nav-btn backup">Backup</a>
+                <a href="/backup/livros" class="nav-btn backup" download>Backup</a>
                 <a href="/logout" class="nav-btn logout">Sair</a>
             {% endif %}
             <button class="theme-toggle theme-btn" aria-label="Alternar tema">🌙</button>
@@ -70,10 +70,10 @@
             <span class="icon">➕</span>
         </a>
 
-        <a href="/backup/livros" class="mobile-item">
+        <a href="/backup/livros" class="mobile-item" download>
             <span class="icon">💾</span>
-            <span class="label"></span>
         </a>
+
         {% endif %}
 
         {% if session.role %}
@@ -123,7 +123,8 @@
       if (
         href.startsWith("/") &&
         !href.startsWith("#") &&
-        !link.target
+        !link.target &&
+        !link.hasAttribute("download")
       ) {
         loader.classList.remove("hidden");
       }
