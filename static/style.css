@@ -245,6 +245,7 @@ tr:hover td {
 }
 
 .livro-card {
+    display: flex;
     background: var(--bg-card);
     backdrop-filter: blur(10px);
     border-radius: 18px;
@@ -1482,4 +1483,171 @@ body.light .icon {
 
 :root[data-theme="light"] .moon {
   opacity: 0;
+}
+.form-emprestar {
+    display: flex;
+    flex-direction: column; /* padrão: empilhado */
+    gap: 8px;
+}
+
+/* desktop */
+@media (min-width: 768px) {
+    .form-emprestar {
+        flex-direction: column; /* FORÇA continuar em coluna */
+    }
+
+    .form-emprestar input,
+    .form-emprestar button {
+        width: 100%;
+    }
+}
+/* =========================
+   BARRA DE PRAZO – FINAL
+========================= */
+
+/* variáveis globais */
+:root {
+  --bar-bg: #e5e7eb;
+  --bar-ok: #4caf50;
+  --bar-alerta: #ff9800;
+  --bar-late: #f44336;
+  --bar-text: #111827;
+}
+
+/* dark mode */
+[data-theme="dark"] {
+  --bar-bg: #1f2937;   /* cinza escuro VISÍVEL */
+  --bar-text: #e5e7eb;
+}
+
+/* container */
+.prazo-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bar-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+/* preenchimento */
+.prazo-fill {
+  height: 100%;
+  min-width: 4px; /* nunca some */
+  transition: width .4s ease;
+}
+
+/* estados */
+.prazo-fill.ok {
+  background: var(--bar-ok);
+}
+
+.prazo-fill.alerta {
+  background: var(--bar-alerta);
+}
+
+.prazo-fill.estourado {
+  background: var(--bar-late);
+}
+
+/* texto */
+.atrasado {
+  color: var(--bar-late);
+  font-weight: 700;
+}
+.prazo-card {
+    margin-top: 6px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: var(--bar-bg);
+}
+
+.barra-prazo {
+    width: 100%;
+    height: 6px;
+    background: var(--bar-text);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.barra-fill {
+    height: 100%;
+    width: 0;
+    transition: width 0.6s ease;
+    border-radius: 999px;
+}
+
+/* estados */
+.barra-fill.ok {
+    background: #22c55e;
+}
+
+.barra-fill.alerta {
+    background: #facc15;
+}
+
+.barra-fill.estourado {
+    background: #ef4444;
+}
+
+.prazo-texto {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    color: #374151;
+}
+
+/* dark mode */
+body.dark .prazo-card {
+    background: #111827;
+}
+
+body.dark .barra-prazo {
+    background: #1f2933;
+}
+
+body.dark .prazo-texto {
+    color: #e5e7eb;
+}
+
+
+/* dark mode */
+body.dark .gato {
+    color: #9ca3af;
+}
+
+body:not(.dark) .gato {
+    color: #6b7280;
+}
+
+
+
+/* dark mode */
+body.dark .gato-img {
+    opacity: 0.5;
+}
+
+/* mobile n precisa */
+
+
+.gato-wrap {
+    margin-top: auto;
+    padding-top: 12px;
+    display: flex;
+    justify-content: center;
+    opacity: 0.25;
+}
+
+.gato-img {
+    max-width: 120px;
+    filter: grayscale(10%);
+}
+.hidden {
+    display: none;
+}
+@media (max-width: 768px) {
+    .gato-wrap {
+        display: none;
+    }
 }
