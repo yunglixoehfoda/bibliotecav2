@@ -1636,10 +1636,4 @@ body.dark .gato-img {
         display: none;
     }
 }
-.livro-card .autor {
-    white-space: nowrap;      /* impede quebrar linha */
-    overflow: hidden;         /* esconde excesso */
-    text-overflow: ellipsis;  /* adiciona "..." */
-    display: block;
-    max-width: 100%;
-}
+
