@@ -34,6 +34,21 @@ def create_tables(conn):
     """)
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS loans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL,
+        nome TEXT NOT NULL,
+        serie TEXT NOT NULL,
+        turma TEXT NOT NULL CHECK (turma IN ('A','B','C','D','E')),
+        tipo_livro TEXT NOT NULL CHECK (tipo_livro IN ('fino','grosso')),
+        data_emprestimo DATE NOT NULL,
+        data_limite DATE NOT NULL,
+        data_devolucao DATE,
+        FOREIGN KEY (book_id) REFERENCES books(id)
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
@@ -43,3 +58,5 @@ def create_tables(conn):
     """)
 
     conn.commit()
+
+
