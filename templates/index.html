@@ -48,10 +48,31 @@
         <span data-label="Idioma">{{ l.idioma }}</span>
 
         {% if l.disponivel %}
-            <span class="status disponivel">Disponível</span>
-        {% else %}
-            <span class="status emprestado">Emprestado</span>
-        {% endif %}
+    <span class="status disponivel">Disponível</span>
+{% else %}
+    <div class="status emprestado">
+        <span>Emprestado</span>
+
+        {# prazo: se vier do empréstimo usa ele, senão usa o padrão #}
+        {% set prazo = l.prazo_total if l.prazo_total and l.prazo_total > 0 else prazo_padrao %}
+        {% set dias = l.dias_emprestimo %}
+        {% set percent = (dias / prazo * 100) if dias <= prazo else 100 %}
+
+        <div class="prazo-bar">
+            <div
+                class="prazo-fill
+                {% if dias > prazo %}estourado
+                {% elif dias > prazo * 0.7 %}alerta
+                {% else %}ok{% endif %}"
+                style="width: {{ percent }}%">
+            </div>
+        </div>
+
+        <small>{{ dias }} / {{ prazo }} dias</small>
+    </div>
+{% endif %}
+
+
     </div>
     {% endfor %}
 
