@@ -13,11 +13,80 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from flask import send_file
+from datetime import datetime, date
+from datetime import timedelta
 
 
 
 app = Flask(__name__)
 app.secret_key = "jokerehfoda"
+
+
+
+PRAZO_DIAS = 7  # por exemplo, 7 dias de prazo
+
+def preparar_livros(livros):
+    """
+    Recebe lista de livros do banco (dicionários ou objetos)
+    e adiciona campos:
+      - dias_emprestimo
+      - alerta (True/False)
+      - data_emprestimo_formatada
+    """
+    hoje = date.today()
+
+    for l in livros:
+        if l['disponivel']:
+            l['dias_emprestimo'] = 0
+            l['alerta'] = False
+            l['data_emprestimo_formatada'] = None
+        else:
+            if l['data_emprestimo']:
+                data_emp = datetime.strptime(l['data_emprestimo'], "%Y-%m-%d").date()
+                l['dias_emprestimo'] = (hoje - data_emp).days
+                l['alerta'] = l['dias_emprestimo'] > PRAZO_DIAS
+                l['data_emprestimo_formatada'] = data_emp.strftime("%d/%m/%Y")
+            else:
+                l['dias_emprestimo'] = 0
+                l['alerta'] = False
+                l['data_emprestimo_formatada'] = None
+    return livros
+def preparar_livros_home(livros):
+    hoje = date.today()
+    livros_ok = []
+
+    for l in livros:
+        livro = dict(l)
+
+        if livro["disponivel"]:
+            livro["dias_emprestimo"] = 0
+            livro["prazo_total"] = 0
+        else:
+            # busca empréstimo ativo
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT data_emprestimo, data_limite
+                FROM loans
+                WHERE book_id = ? AND data_devolucao IS NULL
+            """, (livro["id"],))
+            emp = cur.fetchone()
+            conn.close()
+
+            if emp:
+                data_emp = datetime.strptime(emp["data_emprestimo"], "%Y-%m-%d").date()
+                livro["dias_emprestimo"] = (hoje - data_emp).days
+                livro["prazo_total"] = (
+                    datetime.strptime(emp["data_limite"], "%Y-%m-%d").date()
+                    - data_emp
+                ).days
+            else:
+                livro["dias_emprestimo"] = 0
+                livro["prazo_total"] = 0
+
+        livros_ok.append(livro)
+
+    return livros_ok
 
 def bibliotecario_required(f):
     @wraps(f)
@@ -96,22 +165,28 @@ def index():
     genero = request.args.get("genero")
 
     livros = buscar_livros(conn, termo, categoria, genero)
+    conn.close()
 
+    livros = preparar_livros_home(livros)
+
+    conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id, nome FROM categories")
     categorias = cur.fetchall()
 
     cur.execute("SELECT id, nome FROM genres")
     generos = cur.fetchall()
-
     conn.close()
 
     return render_template(
         "index.html",
         livros=livros,
         categorias=categorias,
-        generos=generos
+        generos=generos,
+        prazo_padrao=8
     )
+
+
 
 
 @app.route("/livros")
@@ -124,6 +199,9 @@ def livros():
     categoria = request.args.get("categoria")
     genero = request.args.get("genero")
 
+    # =========================
+    # BUSCA DOS LIVROS
+    # =========================
     sql = """
         SELECT
             b.id,
@@ -133,7 +211,6 @@ def livros():
             b.isbn,
             b.idioma,
             b.disponivel,
-            b.emprestado_para,
             c.nome AS categoria,
             g.nome AS genero
         FROM books b
@@ -158,20 +235,79 @@ def livros():
     cur.execute(sql, params)
     livros = cur.fetchall()
 
-    # pegar categorias e generos pra filtro
+    # =========================
+    # BUSCA DOS EMPRÉSTIMOS ATIVOS
+    # =========================
+    cur.execute("""
+        SELECT
+            l.id AS loan_id,
+            l.book_id,
+            l.nome,
+            l.serie,
+            l.turma,
+            l.tipo_livro,
+            l.data_emprestimo,
+            l.data_limite,
+            julianday('now') - julianday(l.data_emprestimo) AS dias_passados,
+            julianday(l.data_limite) - julianday(l.data_emprestimo) AS prazo_total
+        FROM loans l
+        WHERE l.data_devolucao IS NULL
+    """)
+    emprestimos = cur.fetchall()
+
+    # =========================
+    # FORMATAR DADOS
+    # =========================
+    livros_formatados = []
+    hoje = date.today()
+
+    for l in livros:
+        livro = dict(l)
+
+        # procura empréstimo desse livro
+        emp = next(
+            (dict(e) for e in emprestimos if e["book_id"] == livro["id"]),
+            None
+        )
+
+        if emp:
+            data_emp = datetime.strptime(emp["data_emprestimo"], "%Y-%m-%d").date()
+
+            livro["emprestado"] = True
+            livro["loan_id"] = emp["loan_id"]
+            livro["emprestado_para"] = f'{emp["nome"]} — {emp["serie"]}{emp["turma"]}'
+            livro["data_emprestimo_formatada"] = data_emp.strftime("%d/%m/%Y")
+            livro["dias_emprestimo"] = (hoje - data_emp).days
+            livro["prazo_total"] = int(emp["prazo_total"])
+            livro["alerta"] = livro["dias_emprestimo"] > livro["prazo_total"]
+        else:
+            livro["emprestado"] = False
+            livro["loan_id"] = None
+            livro["emprestado_para"] = ""
+            livro["data_emprestimo_formatada"] = ""
+            livro["dias_emprestimo"] = 0
+            livro["prazo_total"] = 0
+            livro["alerta"] = False
+
+        livros_formatados.append(livro)
+
+    # =========================
+    # FILTROS
+    # =========================
     cur.execute("SELECT id, nome FROM categories")
     categorias = cur.fetchall()
 
     cur.execute("SELECT id, nome FROM genres")
     generos = cur.fetchall()
 
+    conn.close()
+
     return render_template(
         "livros.html",
-        livros=livros,
+        livros=livros_formatados,
         categorias=categorias,
         generos=generos
     )
-
 
 
 
@@ -215,28 +351,69 @@ def livro_novo():
 @app.route("/livro/<int:id>/emprestar", methods=["POST"])
 @app.route("/livro/<int:id>/emprestar", methods=["POST"])
 def emprestar(id):
-    nome = request.form.get("nome")
-    if not nome:
-        return jsonify({"ok": False, "erro": "Nome obrigatório"}), 400
+    nome = request.form["nome"]
+    serie = request.form["serie"]
+    turma = request.form["turma"]
+    tipo = request.form["tipo_livro"]  # fino | grosso
+
+    prazo = 8 if tipo == "fino" else 20
+
+    hoje = date.today()
+    data_limite = hoje + timedelta(days=prazo)
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("UPDATE books SET disponivel=0, emprestado_para=? WHERE id=?", (nome, id))
-    conn.commit()
-    conn.close()
 
-    return jsonify({"ok": True, "nome": nome})
+    # cria empréstimo
+    cur.execute("""
+        INSERT INTO loans
+        (book_id, nome, serie, turma, tipo_livro, data_emprestimo, data_limite)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        id,
+        nome,
+        serie,
+        turma,
+        tipo,
+        hoje.isoformat(),
+        data_limite.isoformat()
+    ))
 
+    # marca livro indisponível
+    cur.execute("UPDATE books SET disponivel=0 WHERE id=?", (id,))
 
-@app.route("/livro/<int:id>/devolver", methods=["POST"])
-def devolver(id):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("UPDATE books SET disponivel=1, emprestado_para=NULL WHERE id=?", (id,))
     conn.commit()
     conn.close()
 
     return jsonify({"ok": True})
+
+
+
+@app.route("/loan/<int:loan_id>/devolver", methods=["POST"])
+@login_required()
+def devolver_loan(loan_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE loans
+        SET data_devolucao = DATE('now')
+        WHERE id = ?
+    """, (loan_id,))
+
+    cur.execute("""
+        UPDATE books
+        SET disponivel = 1
+        WHERE id = (
+            SELECT book_id FROM loans WHERE id = ?
+        )
+    """, (loan_id,))
+
+    conn.commit()
+    conn.close()
+
+    return {"ok": True}
+
 
 
 @app.route("/livro/<int:id>/editar", methods=["GET", "POST"])
@@ -392,6 +569,32 @@ def backup_livros():
         download_name="backup_livros.pdf",
         mimetype="application/pdf"
     )
+
+@app.route("/devolver/<int:loan_id>")
+@login_required()
+def devolver(loan_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE loans
+        SET data_devolucao = DATE('now')
+        WHERE id = ?
+    """, (loan_id,))
+
+    cur.execute("""
+        UPDATE books
+        SET disponivel = 1
+        WHERE id = (
+            SELECT book_id FROM loans WHERE id = ?
+        )
+    """, (loan_id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/livros")
+
 
 
 if __name__ == "__main__":
