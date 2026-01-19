@@ -6,12 +6,14 @@
 <h1>Livros</h1>
 
 <form method="get" class="busca-form">
-    <input type="text" name="q" placeholder="Buscar por título ou autor" value="{{ request.args.get('q', '') }}">
+    <input type="text" name="q" placeholder="Buscar por título ou autor"
+           value="{{ request.args.get('q', '') }}">
 
     <select name="categoria">
         <option value="">Todas categorias</option>
         {% for c in categorias %}
-            <option value="{{ c.id }}" {% if request.args.get('categoria') == c.id|string %}selected{% endif %}>
+            <option value="{{ c.id }}"
+                {% if request.args.get('categoria') == c.id|string %}selected{% endif %}>
                 {{ c.nome }}
             </option>
         {% endfor %}
@@ -20,7 +22,8 @@
     <select name="genero">
         <option value="">Todos gêneros</option>
         {% for g in generos %}
-            <option value="{{ g.id }}" {% if request.args.get('genero') == g.id|string %}selected{% endif %}>
+            <option value="{{ g.id }}"
+                {% if request.args.get('genero') == g.id|string %}selected{% endif %}>
                 {{ g.nome }}
             </option>
         {% endfor %}
@@ -33,61 +36,55 @@
 
 <div class="livros-grid">
 {% for l in livros %}
-    <div class="livro-card" id="livro-{{ l.id }}">
-        <h3>{{ l.titulo }}</h3>
-        <p class="autor">{{ l.autor }}</p>
-        <p class="meta">{{ l.categoria }} • {{ l.genero }} • {{ l.idioma }}</p>
+<div class="livro-card" id="livro-{{ l.id }}">
+    <h3>{{ l.titulo }}</h3>
+    <p class="autor">{{ l.autor }}</p>
+    <p class="meta">{{ l.categoria }} • {{ l.genero }} • {{ l.idioma }}</p>
 
-        {% if not l.emprestado %}
-            <span class="status disponivel">Disponível</span>
+    {% if not l.emprestado %}
+        <span class="status disponivel">Disponível</span>
 
-            <form class="form-emprestar" onsubmit="emprestarLivro(event, {{ l.id }})">
-                <input name="nome" placeholder="Nome do aluno" required>
-                <input name="serie" placeholder="Série (ex: 7)" required>
+        <form class="form-emprestar" onsubmit="emprestarLivro(event, {{ l.id }})">
+            <input name="nome" placeholder="Nome do aluno" required>
+            <input name="serie" placeholder="Série (ex: 7)" required>
 
-                <select name="turma" required>
-                    <option value="">Turma</option>
-                    <option>A</option>
-                    <option>B</option>
-                    <option>C</option>
-                    <option>D</option>
-                    <option>E</option>
-                </select>
+            <select name="turma" required>
+                <option value="">Turma</option>
+                <option>A</option><option>B</option><option>C</option>
+                <option>D</option><option>E</option>
+            </select>
 
-                <select name="tipo_livro" required>
-                    <option value="">Tipo do livro</option>
-                    <option value="fino">Fino (8 dias)</option>
-                    <option value="grosso">Grosso (20 dias)</option>
-                </select>
+            <select name="tipo_livro" required>
+                <option value="">Tipo do livro</option>
+                <option value="fino">Fino (8 dias)</option>
+                <option value="grosso">Grosso (20 dias)</option>
+            </select>
 
-                <button class="btn btn-success">Emprestar</button>
-            </form>
+            <button class="btn btn-success">Emprestar</button>
+        </form>
 
-        {% else %}
-            <span class="status emprestado">
-                Emprestado para <b>{{ l.emprestado_para }}</b><br>
-                Empréstimo: {{ l.data_emprestimo_formatada }}
-            </span>
+    {% else %}
+        <span class="status emprestado">
+            Emprestado para <b>{{ l.emprestado_para }}</b><br>
+            Empréstimo: {{ l.data_emprestimo_formatada }}
+        </span>
 
-            {% set dias = l.dias_emprestimo %}
-            {% set prazo = l.prazo_total %}
-            {% set atraso = dias - prazo %}
-            {% set percent = (dias / prazo * 100) if prazo > 0 else 0 %}
-            {% if percent > 100 %}{% set percent = 100 %}{% endif %}
+        {% set dias = l.dias_emprestimo %}
+        {% set prazo = l.prazo_total %}
+        {% set atraso = dias - prazo %}
+        {% set percent = (dias / prazo * 100) if prazo > 0 else 0 %}
+        {% if percent > 100 %}{% set percent = 100 %}{% endif %}
 
-            <!-- barra de progresso -->
-            <div class="prazo-card">
-
+        <div class="prazo-card">
             <div class="barra-prazo">
-                <div
-                    class="barra-fill
+                <div class="barra-fill
                     {% if dias > prazo %}estourado
                     {% elif dias > prazo * 0.7 %}alerta
                     {% else %}ok{% endif %}"
                     style="width: {{ percent }}%">
                 </div>
             </div>
-            <small>
+
             <div class="prazo-texto">
                 {% if dias <= prazo %}
                     {{ dias }} / {{ prazo }} dias
@@ -95,65 +92,96 @@
                     ⚠️ Atrasado há {{ atraso }} dia{{ 's' if atraso > 1 else '' }}
                 {% endif %}
             </div>
-
         </div>
 
+        <form class="form-devolver" onsubmit="devolverLivro(event, {{ l.loan_id }})">
+            <button class="btn btn-warning">Devolver</button>
+        </form>
+    {% endif %}
 
-            </small>
+    <a href="/livro/{{ l.id }}/editar" class="btn btn-primary btn-editar">
+        Editar livro
+    </a>
 
-            <form class="form-devolver" onsubmit="devolverLivro(event, {{ l.loan_id }})">
-                <button class="btn btn-warning">Devolver</button>
-            </form>
+    <button type="button"
+            class="btn btn-danger btn-remover"
+            data-id="{{ l.id }}"
+            data-titulo="{{ l.titulo }}"
+            onclick="abrirModal(this)">
+        Remover livro
+    </button>
 
-        {% endif %}
-
-        <a href="/livro/{{ l.id }}/editar" class="btn btn-primary btn-editar">Editar livro</a>
-
-        <button type="button"
-                class="btn btn-danger btn-remover"
-                data-id="{{ l.id }}"
-                data-titulo="{{ l.titulo }}"
-                onclick="abrirModal(this)">
-            Remover livro
-        </button>
-        
-        <div class="gato-wrap {% if not l.emprestado %}hidden{% endif %}">
-            <img src="{{ url_for('static', filename='img/gato.png') }}"
-                class="gato-img">
-        </div>
-
-       
-
-        
-        
-        
+    <div class="gato-wrap {% if not l.emprestado %}hidden{% endif %}">
+        <img src="{{ url_for('static', filename='img/gato.png') }}"
+             class="gato-img">
     </div>
-    
+</div>
 {% endfor %}
 </div>
 
+<!-- MODAL REMOVER -->
+<div id="modal-remover" class="modal hidden">
+    <div class="modal-box">
+        <h3>Remover livro</h3>
+        <p>Digite exatamente: <b id="titulo-confirmacao"></b></p>
+
+        <input type="text" id="input-confirmacao"
+               placeholder="Digite o nome do livro">
+
+        <form id="form-remover" method="post">
+            <div class="modal-acoes">
+                <button type="button" class="btn btn-primary"
+                        onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-danger"
+                        id="btn-confirmar" disabled>
+                    Remover livro
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+function abrirModal(btn) {
+    const id = btn.dataset.id;
+    const titulo = btn.dataset.titulo;
+
+    document.getElementById("modal-remover").classList.remove("hidden");
+    document.getElementById("titulo-confirmacao").innerText = titulo;
+
+    const input = document.getElementById("input-confirmacao");
+    const confirmar = document.getElementById("btn-confirmar");
+    const form = document.getElementById("form-remover");
+
+    input.value = "";
+    confirmar.disabled = true;
+    form.action = `/livro/${id}/remover`;
+
+    input.oninput = () => {
+        confirmar.disabled = input.value.trim() !== titulo;
+    };
+}
+
+function fecharModal() {
+    document.getElementById("modal-remover").classList.add("hidden");
+}
+
 async function emprestarLivro(e, id) {
     e.preventDefault();
-    const form = e.target;
-
     const resp = await fetch(`/livro/${id}/emprestar`, {
         method: "POST",
-        body: new FormData(form)
+        body: new FormData(e.target)
     });
-
     const data = await resp.json();
-    if (!data.ok) return alert(data.erro || "Erro ao emprestar");
+    if (!data.ok) alert(data.erro || "Erro ao emprestar");
     location.reload();
 }
 
 async function devolverLivro(e, loanId) {
     e.preventDefault();
-
     const resp = await fetch(`/loan/${loanId}/devolver`, { method: "POST" });
     const data = await resp.json();
-
-    if (!data.ok) return alert(data.erro || "Erro ao devolver");
+    if (!data.ok) alert(data.erro || "Erro ao devolver");
     location.reload();
 }
 </script>
