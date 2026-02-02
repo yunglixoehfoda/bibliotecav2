@@ -270,16 +270,28 @@ def livros():
             None
         )
 
+        # Dentro do for l in livros da rota /livros:
         if emp:
-            data_emp = datetime.strptime(emp["data_emprestimo"], "%Y-%m-%d").date()
+            try:
+                # Converter datas de string para objeto date
+                data_emp = datetime.strptime(emp["data_emprestimo"], "%Y-%m-%d").date()
+                data_limite = datetime.strptime(emp["data_limite"], "%Y-%m-%d").date()
+                
+                livro["dias_emprestimo"] = (hoje - data_emp).days
+                
+                livro["prazo_total"] = (data_limite - data_emp).days
+                
+                livro["alerta"] = hoje > data_limite
+                
+            except (ValueError, TypeError):
+                livro["dias_emprestimo"] = 0
+                livro["prazo_total"] = 0
+                livro["alerta"] = False
 
             livro["emprestado"] = True
             livro["loan_id"] = emp["loan_id"]
             livro["emprestado_para"] = f'{emp["nome"]} — {emp["serie"]}{emp["turma"]}'
             livro["data_emprestimo_formatada"] = data_emp.strftime("%d/%m/%Y")
-            livro["dias_emprestimo"] = (hoje - data_emp).days
-            livro["prazo_total"] = int(emp["prazo_total"])
-            livro["alerta"] = livro["dias_emprestimo"] > livro["prazo_total"]
         else:
             livro["emprestado"] = False
             livro["loan_id"] = None
@@ -599,3 +611,4 @@ def devolver(loan_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
